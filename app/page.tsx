@@ -146,18 +146,31 @@ export default function Home() {
           </div>
 
           {/* Nav links */}
-          <nav style={{ display: "flex", gap: 20, marginLeft: "auto", flexShrink: 0 }}>
-            {["Sign In", "Join Free", "Deals"].map((link) => (
-              <a key={link} href="#" style={{
-                color: link === "Join Free" ? "#ffd700" : "#fff",
-                textDecoration: "none",
-                fontSize: "0.9rem",
-                fontWeight: link === "Join Free" ? 700 : 400,
-                whiteSpace: "nowrap",
-              }}>
-                {link}
-              </a>
-            ))}
+          <nav style={{ display: "flex", alignItems: "center", gap: 20, marginLeft: "auto", flexShrink: 0 }}>
+            <a href="#" style={{ color: "#fff", textDecoration: "none", fontSize: "0.9rem", whiteSpace: "nowrap" }}>
+              Sign In
+            </a>
+            <a href="#" style={{ color: "#fff", textDecoration: "none", fontSize: "0.9rem", whiteSpace: "nowrap" }}>
+              Deals
+            </a>
+            {/* Membership CTA */}
+            <a href="#" style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              backgroundColor: "#ffd700",
+              color: "#003580",
+              textDecoration: "none",
+              padding: "6px 16px",
+              borderRadius: 6,
+              whiteSpace: "nowrap",
+              lineHeight: 1.2,
+            }}>
+              <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>Join — $9.99/mo</span>
+              <span style={{ fontWeight: 500, fontSize: "0.72rem", opacity: 0.8 }}>
+                Members save up to 40%
+              </span>
+            </a>
           </nav>
         </div>
       </header>
