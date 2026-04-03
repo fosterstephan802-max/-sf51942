@@ -10,15 +10,310 @@ import { useState, useEffect } from "react";
 ───────────────────────────────────────────────────────────── */
 const SCENE_DURATIONS = [1500, 1500, 2500, 2500]; // ms per scene
 
-const BENEFITS = [
-  "🎁  50% off when you spend $50+ on your 1st order",
-  "✅  Save up to 40% at 500+ stores every month",
-  "✅  Exclusive member-only flash deals",
-  "✅  Free worldwide price alerts",
-  "✅  Priority customer support",
+/* ─────────────────────────────────────────────────────────────
+   Monthly Rotating Campaign System
+   One strategy auto-activates each calendar month (index 0-11).
+   Change campaigns here; everything else updates automatically.
+───────────────────────────────────────────────────────────── */
+type Campaign = {
+  month: string;
+  navSubLabel: string;
+  barBg: string;
+  barEmoji: string;
+  barLabel: string;
+  barHighlight: string;
+  barCta: string;
+  heroBadge: string;
+  heroGradient: string;
+  heroTitle: string;
+  heroTitleHighlight: string;
+  heroBody: string;
+  chips: string[];
+  heroCta: string;
+  heroFine: string;
+  benefits: string[];
+};
+
+const MONTHLY_CAMPAIGNS: Campaign[] = [
+  /* 0 – January ─ New Year, New Savings */
+  {
+    month: "January",
+    navSubLabel: "50% off your 1st $50+ order 🎉",
+    barBg: "#c8102e", barEmoji: "🎉", barLabel: "New Year offer:",
+    barHighlight: "50% OFF your first order of $50+",
+    barCta: "Claim Now",
+    heroBadge: "🌐 International Shoppers Club — New Year Special",
+    heroGradient: "linear-gradient(135deg,#003580 0%,#0052a5 50%,#c8102e 100%)",
+    heroTitle: "New Year, New Savings —",
+    heroTitleHighlight: "50% Off Your First Order",
+    heroBody: "Spend $50 or more on your first order this January and we'll cut the bill in half — automatically. No promo code needed. Cancel anytime.",
+    chips: ["🎁 50% off first $50+ order", "🔓 No credit card to join", "📦 500+ stores, 1 membership", "⚡ Instant flash-deal access", "🚫 Cancel anytime, no fees"],
+    heroCta: "Join Free — Claim 50% Off Now 🎉",
+    heroFine: "New members only · First month only · $50 minimum order",
+    benefits: [
+      "🎁  50% off when you spend $50+ on your 1st order",
+      "✅  Save up to 40% at 500+ stores every month",
+      "✅  Exclusive member-only flash deals",
+      "✅  Free worldwide price alerts",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 1 – February ─ Valentine's Referral */
+  {
+    month: "February",
+    navSubLabel: "Refer a friend — both save 30% 💝",
+    barBg: "#a0003a", barEmoji: "💝", barLabel: "Valentine's offer:",
+    barHighlight: "Bring a friend — you both save 30% this month",
+    barCta: "Share the Love",
+    heroBadge: "💝 Valentine's Day — Members & Their Plus-Ones",
+    heroGradient: "linear-gradient(135deg,#7b0030 0%,#c8102e 50%,#ff6b9d 100%)",
+    heroTitle: "Share the Love,",
+    heroTitleHighlight: "Share the Savings 💕",
+    heroBody: "Join this February and invite a friend or partner. You both unlock 30% off sitewide — the perfect gift that keeps giving all month long.",
+    chips: ["💝 Refer 1 friend, you both save 30%", "🔓 Free to join", "🎁 Perfect as a gift", "📦 500+ stores covered", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Share 30% Off 💕",
+    heroFine: "Both members must join in February · Offer ends Feb 28",
+    benefits: [
+      "💝  Refer a friend — you both save 30% this month",
+      "✅  Save up to 40% at 500+ stores",
+      "✅  Exclusive member-only flash deals",
+      "✅  Free worldwide price alerts",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 2 – March ─ Spring $15 Bonus Credit */
+  {
+    month: "March",
+    navSubLabel: "$15 bonus credit on first purchase 🌱",
+    barBg: "#005a1e", barEmoji: "🌱", barLabel: "Spring Kickoff:",
+    barHighlight: "$15 bonus credit added to your first purchase",
+    barCta: "Claim $15 Credit",
+    heroBadge: "🌱 Spring Kickoff — Members Get More",
+    heroGradient: "linear-gradient(135deg,#003a00 0%,#228b22 55%,#005082 100%)",
+    heroTitle: "Spring Into Savings —",
+    heroTitleHighlight: "$15 Bonus Credit, Free",
+    heroBody: "Join this month and we'll drop a $15 bonus credit straight into your account — use it on any purchase across 500+ stores. No strings attached.",
+    chips: ["💵 $15 bonus credit on 1st purchase", "🔓 Completely free to join", "🌱 Fresh deals every week", "📦 500+ partner stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Get $15 Credit 🌱",
+    heroFine: "New members only · Credit applied automatically · March",
+    benefits: [
+      "💵  $15 bonus credit on your very first purchase",
+      "✅  Save up to 40% at 500+ stores every month",
+      "✅  Exclusive member-only flash deals",
+      "✅  Free worldwide price alerts",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 3 – April ─ Flash Deal Early Access */
+  {
+    month: "April",
+    navSubLabel: "48-hr early access to flash deals ⚡",
+    barBg: "#4b0082", barEmoji: "⚡", barLabel: "Flash Deal Insider:",
+    barHighlight: "Members see deals 48 hrs before the public",
+    barCta: "Get Early Access",
+    heroBadge: "⚡ Flash Deal Insider — April Exclusive",
+    heroGradient: "linear-gradient(135deg,#1a0050 0%,#4b0082 50%,#003580 100%)",
+    heroTitle: "Shop Before",
+    heroTitleHighlight: "Everyone Else Does ⚡",
+    heroBody: "Join this April and get insider access to flash deals a full 48 hours before they go public. While others wait, you save. Spots are limited per deal.",
+    chips: ["⚡ 48-hr early deal access", "🔓 Free membership", "🔔 Instant deal alerts", "📦 500+ stores", "🚫 No commitment"],
+    heroCta: "Join Free — Get Early Access ⚡",
+    heroFine: "Early access applies to flash deals only · April",
+    benefits: [
+      "⚡  48-hour early access to all flash sales",
+      "🔔  Deal alerts before public announcement",
+      "✅  Save up to 40% at 500+ stores",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 4 – May ─ Member Appreciation 2× Cashback */
+  {
+    month: "May",
+    navSubLabel: "2× cashback — Member Appreciation 🥇",
+    barBg: "#8b5a00", barEmoji: "🥇", barLabel: "Member Appreciation:",
+    barHighlight: "Double cashback on every purchase all May",
+    barCta: "Double My Savings",
+    heroBadge: "🥇 Member Appreciation Month — May Rewards",
+    heroGradient: "linear-gradient(135deg,#003580 0%,#8b5a00 50%,#ffd700 100%)",
+    heroTitle: "Earn Double —",
+    heroTitleHighlight: "2× Cashback All Month 🥇",
+    heroBody: "May is member appreciation month. Join now and every purchase earns twice the cashback — automatically stacked on top of already-discounted prices.",
+    chips: ["🥇 2× cashback all May", "💰 Stacks on store discounts", "🔓 Free to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Start Earning 2× 🥇",
+    heroFine: "Double cashback applies to May purchases only · New members",
+    benefits: [
+      "🥇  2× cashback on every purchase this month",
+      "💰  Stacks on top of existing store discounts",
+      "✅  Save up to 40% at 500+ stores",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 5 – June ─ Summer VIP Upgrade */
+  {
+    month: "June",
+    navSubLabel: "Free 3-month VIP upgrade — $30 value 🌊",
+    barBg: "#006994", barEmoji: "🌊", barLabel: "Summer VIP Upgrade:",
+    barHighlight: "Join now, get 3 months of VIP free — $30 value",
+    barCta: "Upgrade Free",
+    heroBadge: "🌊 Summer VIP Club — June Exclusive",
+    heroGradient: "linear-gradient(135deg,#003f5e 0%,#0077a8 50%,#00bcd4 100%)",
+    heroTitle: "Join Free, Get",
+    heroTitleHighlight: "3 Months of VIP Free 🌊",
+    heroBody: "Join the International Shoppers Club this June and receive a complimentary 3-month VIP upgrade. VIP members unlock bonus deals, priority support, and exclusive cashback tiers.",
+    chips: ["🌊 3-month VIP free ($30 value)", "🎯 Bonus VIP-only deals", "🔓 No credit card to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Get 3 Months VIP 🌊",
+    heroFine: "VIP upgrade auto-applied for June joiners · No card required",
+    benefits: [
+      "🌊  Free 3-month VIP upgrade — $30 value",
+      "🎯  Bonus VIP-exclusive deal tiers",
+      "✅  Save up to 40% at 500+ stores",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 6 – July ─ Mid-Year Spin-to-Win Mystery Discount */
+  {
+    month: "July",
+    navSubLabel: "Spin to win — up to 60% off 🎰",
+    barBg: "#b83200", barEmoji: "🎰", barLabel: "Mid-Year Blowout:",
+    barHighlight: "Spin the wheel — win up to 60% off your first order",
+    barCta: "Spin Now",
+    heroBadge: "🎰 Mid-Year Mystery Blowout — July Only",
+    heroGradient: "linear-gradient(135deg,#003580 0%,#8b0000 40%,#b83200 100%)",
+    heroTitle: "Spin to Win —",
+    heroTitleHighlight: "Up to 60% Off Your First Order 🎰",
+    heroBody: "July's mystery discount wheel is live! Every new member spins and reveals their personal discount — anywhere from 20% to 60% off their first order. Join free to spin.",
+    chips: ["🎰 Spin for 20–60% off", "🎁 Every member wins", "🔓 Free to join & spin", "📦 500+ stores", "🚫 No obligation"],
+    heroCta: "Join Free — Spin the Wheel 🎰",
+    heroFine: "One spin per new member · Minimum 20% guaranteed · July only",
+    benefits: [
+      "🎰  Spin the wheel — win 20% to 60% off your 1st order",
+      "🎁  Every member wins a guaranteed discount",
+      "✅  Save up to 40% at 500+ stores",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 7 – August ─ Back to School 40% Off */
+  {
+    month: "August",
+    navSubLabel: "40% off tech & school supplies 🎒",
+    barBg: "#004d1a", barEmoji: "🎒", barLabel: "Back to School:",
+    barHighlight: "Members save 40% on tech & school supplies this August",
+    barCta: "Shop School Deals",
+    heroBadge: "🎒 Back to School — August Members Only",
+    heroGradient: "linear-gradient(135deg,#00270d 0%,#004d1a 50%,#003580 100%)",
+    heroTitle: "Back to School —",
+    heroTitleHighlight: "40% Off Tech & Supplies 🎒",
+    heroBody: "August is the biggest back-to-school month. Members get exclusive 40% off on electronics, stationery, and school essentials across 500+ partner stores.",
+    chips: ["🎒 40% off tech & school gear", "💻 Laptops, tablets, supplies", "🔓 Free to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Save 40% on School Gear 🎒",
+    heroFine: "40% discount on eligible school categories · August only",
+    benefits: [
+      "🎒  40% off tech, school & office supplies",
+      "💻  Covers laptops, tablets, stationery & more",
+      "✅  Save up to 40% at 500+ stores all year",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 8 – September ─ Fall Deals 24-Hr Preview */
+  {
+    month: "September",
+    navSubLabel: "Preview fall deals 24 hrs early 🍂",
+    barBg: "#6b3300", barEmoji: "🍂", barLabel: "Fall Preview:",
+    barHighlight: "Members unlock fall deals 24 hours before the public",
+    barCta: "Preview Deals",
+    heroBadge: "🍂 Fall Deals Preview — September Members",
+    heroGradient: "linear-gradient(135deg,#4a1a00 0%,#8b4513 50%,#003580 100%)",
+    heroTitle: "First Look at",
+    heroTitleHighlight: "Fall's Best Deals 🍂",
+    heroBody: "As a member you get a 24-hour head start on all fall promotions before they go public. Grab the best products at the best prices before they sell out.",
+    chips: ["🍂 24-hr early fall deal access", "🔔 Priority deal alerts", "🔓 Free to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Preview Fall Deals 🍂",
+    heroFine: "Early access applies to Fall promotion events · September",
+    benefits: [
+      "🍂  24-hour early access to all fall promotions",
+      "🔔  Priority alerts before deals go public",
+      "✅  Save up to 40% at 500+ stores all year",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 9 – October ─ Halloween Mystery Savings */
+  {
+    month: "October",
+    navSubLabel: "Mystery savings — up to 60% off 🎃",
+    barBg: "#4a0080", barEmoji: "🎃", barLabel: "Spooky Savings:",
+    barHighlight: "Reveal your mystery discount — up to 60% off",
+    barCta: "Reveal My Deal",
+    heroBadge: "🎃 Spooky Savings Event — October Members",
+    heroGradient: "linear-gradient(135deg,#1a0030 0%,#4a0080 40%,#b84800 100%)",
+    heroTitle: "Spooky Good Savings —",
+    heroTitleHighlight: "Your Discount Is a Mystery 👻",
+    heroBody: "Join in October and unbox a mystery savings amount — 20%, 40%, or a jaw-dropping 60% off your first order. You won't know until you join! Everyone wins something.",
+    chips: ["🎃 Mystery discount: 20–60% off", "👻 Every member wins", "🔓 Free to join", "📦 500+ stores", "🚫 No tricks, just treats"],
+    heroCta: "Join Free — Reveal Your Discount 🎃",
+    heroFine: "Mystery discount revealed at sign-up · October members only",
+    benefits: [
+      "🎃  Mystery discount revealed at join — up to 60% off",
+      "👻  Everyone wins — minimum 20% guaranteed",
+      "✅  Save up to 40% at 500+ stores all year",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 10 – November ─ Black Friday 48-Hr Early Access */
+  {
+    month: "November",
+    navSubLabel: "Shop Black Friday 48 hrs early 🛒",
+    barBg: "#0d0d0d", barEmoji: "🛒", barLabel: "Black Friday Early Access:",
+    barHighlight: "Members shop Black Friday 48 hrs before everyone else",
+    barCta: "Get Early Access",
+    heroBadge: "🛒 Black Friday Early Access — November Members",
+    heroGradient: "linear-gradient(135deg,#0d0d0d 0%,#1a0000 40%,#003580 100%)",
+    heroTitle: "Beat the Rush —",
+    heroTitleHighlight: "Shop Black Friday 48 Hrs Early 🛒",
+    heroBody: "Members get exclusive access to all Black Friday deals a full 48 hours before the public. The best products sell out fast — get in before the crowd.",
+    chips: ["🛒 48-hr early Black Friday access", "⚡ Best deals before sell-out", "🔓 Free to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Shop Black Friday Early 🛒",
+    heroFine: "Early access for November members · Black Friday deals only",
+    benefits: [
+      "🛒  Shop Black Friday deals 48 hours early",
+      "⚡  Best items before they sell out",
+      "✅  Save up to 40% at 500+ stores all year",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
+  /* 11 – December ─ Holiday VIP: 50% Off + Free Gift Wrap */
+  {
+    month: "December",
+    navSubLabel: "50% off + free gift wrap 🎄",
+    barBg: "#006400", barEmoji: "🎄", barLabel: "Holiday VIP Package:",
+    barHighlight: "50% off first $50+ order + free gift wrapping this December",
+    barCta: "Unwrap Savings",
+    heroBadge: "🎄 Holiday VIP Package — December Exclusive",
+    heroGradient: "linear-gradient(135deg,#003580 0%,#006400 50%,#8b0000 100%)",
+    heroTitle: "Holiday Savings —",
+    heroTitleHighlight: "50% Off + Free Gift Wrapping 🎁",
+    heroBody: "Join free this December and receive 50% off your first $50+ order, plus complimentary gift wrapping on every item. Give more, spend less.",
+    chips: ["🎄 50% off first $50+ order", "🎁 Free gift wrapping", "🔓 No credit card to join", "📦 500+ stores", "🚫 Cancel anytime"],
+    heroCta: "Join Free — Claim Holiday Savings 🎄",
+    heroFine: "Holiday offer for new members · 50% off on $50+ · December",
+    benefits: [
+      "🎄  50% off your first $50+ holiday order",
+      "🎁  Free gift wrapping on every item",
+      "✅  Save up to 40% at 500+ stores all year",
+      "✅  Exclusive member-only flash deals",
+      "✅  Priority customer support",
+    ],
+  },
 ];
 
-function MembershipWelcomeAd({ onClose }: { onClose: () => void }) {
+function MembershipWelcomeAd({ onClose, benefits }: { onClose: () => void; benefits: string[] }) {
   const [scene, setScene] = useState(0);
 
   useEffect(() => {
@@ -134,7 +429,7 @@ function MembershipWelcomeAd({ onClose }: { onClose: () => void }) {
               <h3 style={{ color: "#ffd700", fontWeight: 700, fontSize: "1.15rem", marginBottom: 16 }}>
                 Your Member Perks
               </h3>
-              {BENEFITS.map((b, i) => (
+              {benefits.map((b, i) => (
                 <div
                   key={b}
                   className="isc-benefit"
@@ -296,15 +591,16 @@ function getBestPrice(prices: { store: string; price: number; url: string }[]) {
 
 export default function Home() {
   const [showAd, setShowAd] = useState(false);
+  const activeCampaign = MONTHLY_CAMPAIGNS[new Date().getMonth()];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
 
-      {showAd && <MembershipWelcomeAd onClose={() => setShowAd(false)} />}
+      {showAd && <MembershipWelcomeAd onClose={() => setShowAd(false)} benefits={activeCampaign.benefits} />}
 
-      {/* ── ANNOUNCEMENT BAR ── urgency + first-order offer */}
+      {/* ── ANNOUNCEMENT BAR ── monthly rotating campaign */}
       <div style={{
-        backgroundColor: "#c8102e",
+        backgroundColor: activeCampaign.barBg,
         color: "#fff",
         textAlign: "center",
         padding: "8px 16px",
@@ -312,17 +608,17 @@ export default function Home() {
         fontWeight: 600,
         letterSpacing: "0.01em",
       }}>
-        🔥 <strong>Limited-time offer:</strong> Join Free today &amp; get&nbsp;
-        <span style={{ color: "#ffd700" }}>50% OFF your first order of $50+</span>
+        {activeCampaign.barEmoji} <strong>{activeCampaign.barLabel}</strong>&nbsp;
+        <span style={{ color: "#ffd700" }}>{activeCampaign.barHighlight}</span>
         &nbsp;·&nbsp;
         <button
           onClick={() => setShowAd(true)}
           style={{
-            background: "#ffd700", color: "#c8102e", border: "none",
+            background: "#ffd700", color: activeCampaign.barBg, border: "none",
             borderRadius: 4, padding: "2px 10px", fontWeight: 800,
             cursor: "pointer", fontSize: "0.85rem",
           }}
-        >Claim Now</button>
+        >{activeCampaign.barCta}</button>
       </div>
 
       {/* ── HEADER / NAVBAR ── */}
@@ -412,7 +708,7 @@ export default function Home() {
             >
               <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>Join Free 🎁</span>
               <span style={{ fontWeight: 500, fontSize: "0.72rem", opacity: 0.85 }}>
-                50% off your 1st $50+ order
+                {activeCampaign.navSubLabel}
               </span>
             </button>
           </nav>
@@ -471,33 +767,27 @@ export default function Home() {
         ))}
       </div>
 
-      {/* ── HERO MEMBERSHIP BANNER ── */}
+      {/* ── HERO MEMBERSHIP BANNER ── monthly rotating campaign */}
       <div style={{
-        background: "linear-gradient(135deg,#003580 0%,#0052a5 50%,#c8102e 100%)",
+        background: activeCampaign.heroGradient,
         color: "#fff",
         padding: "28px 24px",
         textAlign: "center",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <p style={{ margin: "0 0 4px", fontSize: "0.8rem", fontWeight: 600, color: "#ffd700", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            🌐 International Shoppers Club — Exclusive Offer
+            {activeCampaign.heroBadge}
           </p>
           <h2 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 800, lineHeight: 1.25 }}>
-            Join Free &amp; Save <span style={{ color: "#ffd700" }}>50% on Your First Order</span>
+            {activeCampaign.heroTitle}{" "}
+            <span style={{ color: "#ffd700" }}>{activeCampaign.heroTitleHighlight}</span>
           </h2>
           <p style={{ margin: "0 0 18px", fontSize: "0.95rem", color: "#cde", lineHeight: 1.5 }}>
-            Spend $50 or more on your first order this month and we&apos;ll cut the bill in half — automatically.
-            No promo code needed. Cancel anytime.
+            {activeCampaign.heroBody}
           </p>
           {/* Benefit chips */}
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, marginBottom: 20 }}>
-            {[
-              "🎁 50% off first $50+ order",
-              "🔓 No credit card to join",
-              "📦 500+ stores, 1 membership",
-              "⚡ Instant flash-deal access",
-              "🚫 Cancel anytime, no fees",
-            ].map((chip) => (
+            {activeCampaign.chips.map((chip) => (
               <span key={chip} style={{
                 background: "rgba(255,255,255,0.15)",
                 borderRadius: 20,
@@ -522,10 +812,10 @@ export default function Home() {
               boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
             }}
           >
-            Join Free — Claim 50% Off Now 🎉
+            {activeCampaign.heroCta}
           </button>
           <p style={{ margin: "10px 0 0", fontSize: "0.75rem", color: "#aac" }}>
-            Offer valid for new members · First month only · $50 minimum order
+            {activeCampaign.heroFine}
           </p>
         </div>
       </div>
