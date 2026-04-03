@@ -1,3 +1,215 @@
+"use client";
+import { useState, useEffect } from "react";
+
+/* ─────────────────────────────────────────────────────────────
+   Membership Welcome Ad  (5-8 second animated sequence)
+   Scene 1 (0-1.5 s) : envelope slides in
+   Scene 2 (1.5-3 s) : card opens, name / welcome text appears
+   Scene 3 (3-5.5 s) : benefit bullets count in one-by-one
+   Scene 4 (5.5-8 s) : confetti burst + pulsing CTA button
+───────────────────────────────────────────────────────────── */
+const SCENE_DURATIONS = [1500, 1500, 2500, 2500]; // ms per scene
+
+const BENEFITS = [
+  "✅  Save up to 40% at 500+ stores",
+  "✅  Exclusive member-only flash deals",
+  "✅  Free worldwide price alerts",
+  "✅  Priority customer support",
+];
+
+function MembershipWelcomeAd({ onClose }: { onClose: () => void }) {
+  const [scene, setScene] = useState(0);
+
+  useEffect(() => {
+    let elapsed = 0;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    SCENE_DURATIONS.forEach((dur, i) => {
+      elapsed += dur;
+      const t = setTimeout(() => setScene(i + 1), elapsed);
+      timers.push(t);
+    });
+    // Auto-close after total duration
+    const total = SCENE_DURATIONS.reduce((a, b) => a + b, 0);
+    const closeTimer = setTimeout(onClose, total);
+    timers.push(closeTimer);
+    return () => timers.forEach(clearTimeout);
+  }, [onClose]);
+
+  const confetti = ["🎉", "🌟", "🎊", "💛", "🏆", "🎁", "✨", "🥳"];
+
+  return (
+    <>
+      <style>{`
+        @keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+        @keyframes slideDown{ from { transform:translateY(-120px); opacity:0 }
+                               to   { transform:translateY(0);     opacity:1 } }
+        @keyframes popIn    { from { transform:scale(0.4); opacity:0 }
+                               to   { transform:scale(1);   opacity:1 } }
+        @keyframes pulse    { 0%,100%{ transform:scale(1)   }
+                               50%   { transform:scale(1.06) } }
+        @keyframes floatUp  { 0%  { transform:translateY(0)   opacity:1 }
+                               100%{ transform:translateY(-220px); opacity:0 } }
+        @keyframes spin     { to { transform:rotate(360deg) } }
+        .isc-confetti-piece {
+          position:absolute;
+          bottom: 20%;
+          animation: floatUp 2.5s ease-out forwards;
+          font-size: 2rem;
+          pointer-events:none;
+        }
+        .isc-benefit {
+          animation: slideDown 0.5s ease both;
+        }
+        .isc-cta-btn {
+          animation: pulse 1.2s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed", inset: 0, zIndex: 9000,
+          background: "rgba(0,20,60,0.82)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "fadeIn 0.4s ease",
+        }}
+      >
+        {/* Card container – stop click propagation so only backdrop closes */}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "relative",
+            background: "linear-gradient(145deg,#003580 0%,#0052a5 60%,#1a1a2e 100%)",
+            borderRadius: 20,
+            padding: "40px 48px 36px",
+            maxWidth: 480,
+            width: "90%",
+            color: "#fff",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.55)",
+            textAlign: "center",
+            overflow: "hidden",
+            animation: "popIn 0.5s cubic-bezier(0.34,1.56,0.64,1)",
+          }}
+        >
+          {/* Close × */}
+          <button
+            onClick={onClose}
+            style={{
+              position: "absolute", top: 14, right: 18,
+              background: "none", border: "none", color: "#aac",
+              fontSize: "1.4rem", cursor: "pointer", lineHeight: 1,
+            }}
+          >✕</button>
+
+          {/* ── Scene 0: envelope ── */}
+          {scene === 0 && (
+            <div style={{ animation: "slideDown 0.6s ease" }}>
+              <div style={{ fontSize: 80, marginBottom: 12 }}>📩</div>
+              <p style={{ color: "#ffd700", fontWeight: 700, fontSize: "1.1rem" }}>
+                Your membership is on its way…
+              </p>
+            </div>
+          )}
+
+          {/* ── Scene 1: welcome card opens ── */}
+          {scene === 1 && (
+            <div style={{ animation: "popIn 0.5s ease" }}>
+              <div style={{ fontSize: 72, marginBottom: 8 }}>🌐🎉</div>
+              <h2 style={{ fontSize: "1.6rem", fontWeight: 800, color: "#ffd700", margin: "0 0 8px" }}>
+                Welcome to the Club!
+              </h2>
+              <p style={{ color: "#cde", fontSize: "1rem", lineHeight: 1.5 }}>
+                You're now a member of<br />
+                <strong style={{ color: "#fff" }}>International Shoppers Club</strong>
+              </p>
+            </div>
+          )}
+
+          {/* ── Scene 2: benefits ── */}
+          {scene === 2 && (
+            <div style={{ animation: "fadeIn 0.4s ease" }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🏆</div>
+              <h3 style={{ color: "#ffd700", fontWeight: 700, fontSize: "1.15rem", marginBottom: 16 }}>
+                Your Member Perks
+              </h3>
+              {BENEFITS.map((b, i) => (
+                <div
+                  key={b}
+                  className="isc-benefit"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    borderRadius: 8,
+                    padding: "8px 14px",
+                    marginBottom: 8,
+                    textAlign: "left",
+                    fontSize: "0.9rem",
+                    animationDelay: `${i * 0.35}s`,
+                  }}
+                >
+                  {b}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Scene 3: confetti + CTA ── */}
+          {scene >= 3 && (
+            <div style={{ animation: "fadeIn 0.5s ease" }}>
+              {/* Confetti pieces */}
+              {confetti.map((emoji, i) => (
+                <span
+                  key={i}
+                  className="isc-confetti-piece"
+                  style={{
+                    left: `${8 + i * 11}%`,
+                    animationDelay: `${i * 0.18}s`,
+                  }}
+                >
+                  {emoji}
+                </span>
+              ))}
+
+              <div style={{ fontSize: 64, marginBottom: 8 }}>🥳</div>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#ffd700", margin: "0 0 6px" }}>
+                You&apos;re In!
+              </h2>
+              <p style={{ color: "#cde", fontSize: "0.95rem", marginBottom: 22 }}>
+                Start saving on your first order today.
+              </p>
+              <button
+                className="isc-cta-btn"
+                onClick={onClose}
+                style={{
+                  background: "#ffd700",
+                  color: "#003580",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "13px 32px",
+                  fontWeight: 800,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+              >
+                Start Shopping →
+              </button>
+            </div>
+          )}
+
+          {/* Progress bar */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, height: 4,
+            background: "#ffd700",
+            width: `${((scene + 1) / (SCENE_DURATIONS.length + 1)) * 100}%`,
+            transition: "width 0.5s ease",
+            borderRadius: "0 0 0 20px",
+          }} />
+        </div>
+      </div>
+    </>
+  );
+}
+
 const categories = [
   "All", "Electronics", "Clothing", "Home & Garden", "Sports", "Toys", "Beauty", "Books", "Automotive",
 ];
@@ -82,8 +294,12 @@ function getBestPrice(prices: { store: string; price: number; url: string }[]) {
 }
 
 export default function Home() {
+  const [showAd, setShowAd] = useState(false);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+
+      {showAd && <MembershipWelcomeAd onClose={() => setShowAd(false)} />}
 
       {/* ── HEADER / NAVBAR ── */}
       <header style={{
@@ -154,23 +370,27 @@ export default function Home() {
               Deals
             </a>
             {/* Membership CTA */}
-            <a href="#" style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              backgroundColor: "#ffd700",
-              color: "#003580",
-              textDecoration: "none",
-              padding: "6px 16px",
-              borderRadius: 6,
-              whiteSpace: "nowrap",
-              lineHeight: 1.2,
-            }}>
+            <button
+              onClick={() => setShowAd(true)}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                backgroundColor: "#ffd700",
+                color: "#003580",
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: 6,
+                whiteSpace: "nowrap",
+                lineHeight: 1.2,
+                cursor: "pointer",
+              }}
+            >
               <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>Join — $9.99/mo</span>
               <span style={{ fontWeight: 500, fontSize: "0.72rem", opacity: 0.8 }}>
                 Members save up to 40%
               </span>
-            </a>
+            </button>
           </nav>
         </div>
       </header>
