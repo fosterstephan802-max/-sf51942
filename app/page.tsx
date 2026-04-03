@@ -416,7 +416,7 @@ function MembershipWelcomeAd({ onClose, benefits }: { onClose: () => void; benef
                 Welcome to the Club!
               </h2>
               <p style={{ color: "#cde", fontSize: "1rem", lineHeight: 1.5 }}>
-                You're now a member of<br />
+                You&apos;re now a member of<br />
                 <strong style={{ color: "#fff" }}>International Shoppers Club</strong>
               </p>
             </div>
