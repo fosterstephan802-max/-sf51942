@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { label: "👥 Members",    href: "/admin/members"   },
   { label: "📈 Analytics",  href: "/admin/analytics" },
   { label: "💬 Messages",   href: "/admin/messages"  },
+  { label: "⚖️  Legal",      href: "/admin/legal"     },
   { label: "⚙️  Settings",   href: "/admin/settings"  },
 ];
 
