@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { label: "📊 Dashboard",  href: "/admin/dashboard" },
-  { label: "📅 Campaigns",  href: "/admin/campaigns" },
-  { label: "👥 Members",    href: "/admin/members"   },
-  { label: "📈 Analytics",  href: "/admin/analytics" },
-  { label: "💬 Messages",   href: "/admin/messages"  },
-  { label: "⚖️  Legal",      href: "/admin/legal"     },
-  { label: "⚙️  Settings",   href: "/admin/settings"  },
+  { label: "📊 Dashboard",  href: "/admin/dashboard"  },
+  { label: "📅 Campaigns",  href: "/admin/campaigns"  },
+  { label: "👥 Members",    href: "/admin/members"    },
+  { label: "📈 Analytics",  href: "/admin/analytics"  },
+  { label: "💬 Messages",   href: "/admin/messages"   },
+  { label: "📄 Documents",  href: "/admin/documents"  },
+  { label: "🏦 Banking",    href: "/admin/banking"    },
+  { label: "⚖️  Legal",      href: "/admin/legal"      },
+  { label: "⚙️  Settings",   href: "/admin/settings"   },
 ];
 
 const SIDEBAR_W = 220;

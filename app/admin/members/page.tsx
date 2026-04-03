@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 /* ── Mock member data ─────────────────────────────────────────── */
 type Member = {
@@ -53,6 +53,22 @@ const MOCK_MEMBERS: Member[] = Array.from({ length: 60 }, (_, i) => {
 });
 
 /* ── Helpers ──────────────────────────────────────────────────── */
+type ContractStatus = "Not Sent" | "Pending" | "Signed";
+
+function contractBadge(s: ContractStatus) {
+  const cfg: Record<ContractStatus, { bg: string; color: string; icon: string }> = {
+    "Signed":   { bg: "#e8f5e9", color: "#2e7d32", icon: "✅" },
+    "Pending":  { bg: "#fff3e0", color: "#e65100", icon: "⏳" },
+    "Not Sent": { bg: "#f5f5f5", color: "#888",    icon: "—"  },
+  };
+  const c = cfg[s];
+  return (
+    <span style={{ background: c.bg, color: c.color, padding: "3px 10px", borderRadius: 20, fontSize: "0.74rem", fontWeight: 700 }}>
+      {c.icon} {s}
+    </span>
+  );
+}
+
 function statusBadge(s: Member["status"]) {
   const active = s === "Active";
   return (
@@ -92,7 +108,19 @@ export default function MembersPage() {
   const [campaignFilter, setCampaign] = useState("All");
   const [selected, setSelected]     = useState<Member | null>(null);
   const [page, setPage]             = useState(1);
+  const [contractStatuses, setContractStatuses] = useState<Record<number, ContractStatus>>({});
   const PER_PAGE = 12;
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("isc_contract_statuses");
+      if (raw) setContractStatuses(JSON.parse(raw) as Record<number, ContractStatus>);
+    } catch { /* ignore */ }
+  }, []);
+
+  function getContractStatus(id: number): ContractStatus {
+    return contractStatuses[id] ?? "Not Sent";
+  }
 
   const filtered = useMemo(() => MOCK_MEMBERS.filter(m => {
     const q = search.toLowerCase();
@@ -160,7 +188,7 @@ export default function MembersPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.86rem" }}>
             <thead>
               <tr style={{ background: "#f8f9fc" }}>
-                {["Name","Email","Joined","Plan","Status","Revenue","Campaign"].map(h => (
+                {["Name","Email","Joined","Plan","Status","Revenue","Campaign","Contract"].map(h => (
                   <th key={h} style={{ padding: "11px 14px", textAlign: "left", fontWeight: 700, color: "#555", fontSize: "0.76rem", textTransform: "uppercase", letterSpacing: "0.04em", borderBottom: "1px solid #eee" }}>{h}</th>
                 ))}
               </tr>
@@ -186,11 +214,12 @@ export default function MembersPage() {
                     {m.revenue > 0 ? `$${m.revenue.toFixed(2)}` : "—"}
                   </td>
                   <td style={{ padding: "10px 14px", color: "#666" }}>{m.campaign}</td>
+                  <td style={{ padding: "10px 14px" }}>{contractBadge(getContractStatus(m.id))}</td>
                 </tr>
               ))}
               {pageData.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ padding: "28px", textAlign: "center", color: "#bbb" }}>
+                  <td colSpan={8} style={{ padding: "28px", textAlign: "center", color: "#bbb" }}>
                     No members match your filters.
                   </td>
                 </tr>
