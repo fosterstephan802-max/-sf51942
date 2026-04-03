@@ -11,7 +11,8 @@ import { useState, useEffect } from "react";
 const SCENE_DURATIONS = [1500, 1500, 2500, 2500]; // ms per scene
 
 const BENEFITS = [
-  "✅  Save up to 40% at 500+ stores",
+  "🎁  50% off when you spend $50+ on your 1st order",
+  "✅  Save up to 40% at 500+ stores every month",
   "✅  Exclusive member-only flash deals",
   "✅  Free worldwide price alerts",
   "✅  Priority customer support",
@@ -301,6 +302,29 @@ export default function Home() {
 
       {showAd && <MembershipWelcomeAd onClose={() => setShowAd(false)} />}
 
+      {/* ── ANNOUNCEMENT BAR ── urgency + first-order offer */}
+      <div style={{
+        backgroundColor: "#c8102e",
+        color: "#fff",
+        textAlign: "center",
+        padding: "8px 16px",
+        fontSize: "0.88rem",
+        fontWeight: 600,
+        letterSpacing: "0.01em",
+      }}>
+        🔥 <strong>Limited-time offer:</strong> Join Free today &amp; get&nbsp;
+        <span style={{ color: "#ffd700" }}>50% OFF your first order of $50+</span>
+        &nbsp;·&nbsp;
+        <button
+          onClick={() => setShowAd(true)}
+          style={{
+            background: "#ffd700", color: "#c8102e", border: "none",
+            borderRadius: 4, padding: "2px 10px", fontWeight: 800,
+            cursor: "pointer", fontSize: "0.85rem",
+          }}
+        >Claim Now</button>
+      </div>
+
       {/* ── HEADER / NAVBAR ── */}
       <header style={{
         backgroundColor: "#003580",
@@ -386,9 +410,9 @@ export default function Home() {
                 cursor: "pointer",
               }}
             >
-              <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>Join — $9.99/mo</span>
-              <span style={{ fontWeight: 500, fontSize: "0.72rem", opacity: 0.8 }}>
-                Members save up to 40%
+              <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>Join Free 🎁</span>
+              <span style={{ fontWeight: 500, fontSize: "0.72rem", opacity: 0.85 }}>
+                50% off your 1st $50+ order
               </span>
             </button>
           </nav>
@@ -423,6 +447,88 @@ export default function Home() {
           ))}
         </div>
       </nav>
+
+      {/* ── SOCIAL PROOF STRIP ── */}
+      <div style={{
+        background: "#f0f4ff",
+        borderBottom: "1px solid #dce6ff",
+        padding: "10px 24px",
+        display: "flex",
+        justifyContent: "center",
+        gap: 40,
+        flexWrap: "wrap",
+        fontSize: "0.85rem",
+        color: "#003580",
+        fontWeight: 600,
+      }}>
+        {[
+          { icon: "👥", text: "2.4M+ Members worldwide" },
+          { icon: "💰", text: "Avg. $312 saved per year" },
+          { icon: "⭐", text: "4.9 / 5 member rating" },
+          { icon: "🏪", text: "500+ partner stores" },
+        ].map(({ icon, text }) => (
+          <span key={text} style={{ whiteSpace: "nowrap" }}>{icon} {text}</span>
+        ))}
+      </div>
+
+      {/* ── HERO MEMBERSHIP BANNER ── */}
+      <div style={{
+        background: "linear-gradient(135deg,#003580 0%,#0052a5 50%,#c8102e 100%)",
+        color: "#fff",
+        padding: "28px 24px",
+        textAlign: "center",
+      }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <p style={{ margin: "0 0 4px", fontSize: "0.8rem", fontWeight: 600, color: "#ffd700", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            🌐 International Shoppers Club — Exclusive Offer
+          </p>
+          <h2 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 800, lineHeight: 1.25 }}>
+            Join Free &amp; Save <span style={{ color: "#ffd700" }}>50% on Your First Order</span>
+          </h2>
+          <p style={{ margin: "0 0 18px", fontSize: "0.95rem", color: "#cde", lineHeight: 1.5 }}>
+            Spend $50 or more on your first order this month and we&apos;ll cut the bill in half — automatically.
+            No promo code needed. Cancel anytime.
+          </p>
+          {/* Benefit chips */}
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, marginBottom: 20 }}>
+            {[
+              "🎁 50% off first $50+ order",
+              "🔓 No credit card to join",
+              "📦 500+ stores, 1 membership",
+              "⚡ Instant flash-deal access",
+              "🚫 Cancel anytime, no fees",
+            ].map((chip) => (
+              <span key={chip} style={{
+                background: "rgba(255,255,255,0.15)",
+                borderRadius: 20,
+                padding: "5px 14px",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}>{chip}</span>
+            ))}
+          </div>
+          <button
+            onClick={() => setShowAd(true)}
+            style={{
+              background: "#ffd700",
+              color: "#003580",
+              border: "none",
+              borderRadius: 8,
+              padding: "14px 36px",
+              fontWeight: 800,
+              fontSize: "1.05rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
+            }}
+          >
+            Join Free — Claim 50% Off Now 🎉
+          </button>
+          <p style={{ margin: "10px 0 0", fontSize: "0.75rem", color: "#aac" }}>
+            Offer valid for new members · First month only · $50 minimum order
+          </p>
+        </div>
+      </div>
 
       {/* ── MAIN CONTENT ── */}
       <main style={{ flex: 1, maxWidth: 1200, margin: "0 auto", width: "100%", padding: "24px" }}>
